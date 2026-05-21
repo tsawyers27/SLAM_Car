@@ -1,2 +1,4 @@
 # SLAM_Car
 All files and directories for my SLAM_Car portfolio project
+
+UPDATE README ONCE PROJECT COMPLETE TO TALK THROUGH THE PROCESS OF THE PROJECT.
