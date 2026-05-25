@@ -6,7 +6,7 @@ def main():
     parser = argparse.ArgumentParser()
 
     # Add arguments and values to parser
-    parser.add_argument('mode', type=str, required=True,
+    parser.add_argument('--mode', type=str, required=True,
                         choices = ['lidar_test', 'slam', 'motor_test'])
 
     # Control flow logic for different modes
