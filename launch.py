@@ -14,3 +14,6 @@ def main():
 
     if args.mode == 'lidar_test':
         subprocess.run(["ros2 launch rplidar_ros rplidar_a2m12_launch.py"])
+
+if __name__ == '__main__':
+    main()
