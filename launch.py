@@ -13,7 +13,7 @@ def main():
     args = parser.parse_args()
 
     if args.mode == 'lidar_test':
-        subprocess.run(["ros2 launch rplidar_ros rplidar_a2m12_launch.py"])
+        subprocess.run("ros2 launch rplidar_ros rplidar_a2m12_launch.py", shell=True)
 
 if __name__ == '__main__':
     main()
