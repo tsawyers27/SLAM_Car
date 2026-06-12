@@ -88,12 +88,12 @@ int main()
             else if (input == 'd') {
                 direction1 = 1;
                 direction2 = -1;
-                printf("Turning right");
+                printf("Turning right\n");
             }
             else if (input == 'a') {
                 direction1 = -1;
                 direction2 = 1;
-                printf("Turning left");
+                printf("Turning left\n");
             }
             else if (input == 'x') {
                 direction1 = direction2 = 0;
