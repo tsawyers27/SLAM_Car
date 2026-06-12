@@ -119,16 +119,16 @@ int main()
             else if (input == '+') {
                 speed = speed + 10;
                 setMotorSpeed(speed);
-                std::cout << "Increased speed by 10%";
+                std::cout << "Increased speed by 10%\n";
             }
             else if (input == '-') {
                 speed = speed - 10;
                 setMotorSpeed(speed);
-                std::cout << "Decreased speed by 10%";
+                std::cout << "Decreased speed by 10%\n";
             }
         }
         
         sleep_ms(10);
-        
+
     }
 }
