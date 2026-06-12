@@ -98,16 +98,37 @@ int main()
     pwm_set_enabled(slice_num2, true);
 
     while (true) {
-        setMotorSpeed(70);
-        sleep_ms(2000);
+        // Check for user input over serial
+        int input = getchar_timeout_us(0);
 
-        setMotorSpeed(0);
-        sleep_ms(2000);
-
-        setMotorSpeed(-70);
-        sleep_ms(2000);
-
-        setMotorSpeed(0);
-        sleep_ms(2000);
+        // If input equals anything other than a timeout error, control motors
+        if (input != PICO_ERROR_TIMEOUT) {
+            // Forward
+            if (input == 'w') {
+                setMotorSpeed(speed);
+                std::cout << "Forward at " << speed << "\n";
+            }
+            else if (input == 's') {
+                setMotorSpeed(-speed);
+                std::cout << "Backward at " << speed << "\n";
+            }
+            else if (input == 'x') {
+                setMotorSpeed(0);
+                std::cout << "Stopped motors\n";
+            }
+            else if (input == '+') {
+                speed = speed + 10;
+                setMotorSpeed(speed);
+                std::cout << "Increased speed by 10%";
+            }
+            else if (input == '-') {
+                speed = speed - 10;
+                setMotorSpeed(speed);
+                std::cout << "Decreased speed by 10%";
+            }
+        }
+        
+        sleep_ms(10);
+        
     }
 }
