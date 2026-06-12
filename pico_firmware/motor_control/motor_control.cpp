@@ -1,7 +1,6 @@
-#include <stdio.h>
-#include "pico/stdlib.h"
+#include "Motor.h"
 #include "hardware/pwm.h"
-#include "hardware/pio.h"
+#include <stdio.h>
 #include <iostream>
 #include <string>
 
@@ -23,42 +22,12 @@ const uint ENA2 = 7;
 
 // Define baseline speed value (percentage out of 100)
 int speed {50};
-
-void setMotorSpeed(int speed) {
-    // Clamp speed to -100..100
-    if (speed > 100) speed = 100;
-    if (speed < -100) speed = -100;
-    
-    // Positive speed = move forward, Negative speed = move backward
-    if (speed > 0) {
-        gpio_put(IN1, 1);
-        gpio_put(IN2, 0);
-        gpio_put(IN3, 1);
-        gpio_put(IN4, 0);
-    } else if (speed < 0) {
-        gpio_put(IN1, 0);
-        gpio_put(IN2, 1);
-        gpio_put(IN3, 0);
-        gpio_put(IN4, 1);
-        speed = -speed; // Make speed positive for PWM
-    } else {
-        gpio_put(IN1, 0);
-        gpio_put(IN2, 0);
-        gpio_put(IN3, 0);
-        gpio_put(IN4, 0);
-    }
-
-    pwm_set_gpio_level(ENA1, speed * 255 / 100); // Scale speed to PWM range
-    pwm_set_gpio_level(ENA2, speed * 255 / 100); // Scale speed to PWM range
-} 
+int direction1 {0}; // 1 = forward, -1 = backward, 0 = stopped
+int direction2 {0}; // 1 = forward, -1 = backward, 0 = stopped
 
 void sendEncoderData() {
     // Send encoder data via I2C
 
-}
-
-void readKeyboardInput() {
-    //
 }
 
 int main()
@@ -81,7 +50,7 @@ int main()
     gpio_set_dir(IN4, GPIO_OUT);
     gpio_set_dir(ENA2, GPIO_OUT);
 
-    // Tell GPIO 0 and 1 they are allocated to the PWM
+    // Tell GPIO pins they are allocated to the PWM
     gpio_set_function(ENA1, GPIO_FUNC_PWM);
     gpio_set_function(ENA2, GPIO_FUNC_PWM);
 
@@ -97,6 +66,10 @@ int main()
     pwm_set_enabled(slice_num1, true);
     pwm_set_enabled(slice_num2, true);
 
+    // Instantiate motors
+    Motor MOTOR1(IN1, IN2, ENA1);
+    Motor MOTOR2(IN3, IN4, ENA2);
+
     while (true) {
         // Check for user input over serial
         int input = getchar_timeout_us(0);
@@ -105,27 +78,40 @@ int main()
         if (input != PICO_ERROR_TIMEOUT) {
             // Forward
             if (input == 'w') {
-                setMotorSpeed(speed);
-                std::cout << "Forward at " << speed << "\n";
+                direction1 = direction2 = 1;
+                printf("Forward at %d\n", speed);
             }
             else if (input == 's') {
-                setMotorSpeed(-speed);
-                std::cout << "Backward at " << speed << "\n";
+                direction1 = direction2 = -1;
+                printf("Backward at %d\n", speed);
+            }
+            else if (input == 'd') {
+                direction1 = 1;
+                direction2 = -1;
+                printf("Turning right");
+            }
+            else if (input == 'a') {
+                direction1 = -1;
+                direction2 = 1;
+                printf("Turning left");
             }
             else if (input == 'x') {
-                setMotorSpeed(0);
+                direction1 = direction2 = 0;
                 std::cout << "Stopped motors\n";
             }
             else if (input == '+') {
                 speed = speed + 10;
-                setMotorSpeed(speed);
+                if (speed > 100) speed = 100;
                 std::cout << "Increased speed by 10%\n";
             }
             else if (input == '-') {
                 speed = speed - 10;
-                setMotorSpeed(speed);
+                if (speed < 0) speed = 0;
                 std::cout << "Decreased speed by 10%\n";
             }
+
+            MOTOR1.setMotorSpeed(direction1 * speed);
+            MOTOR2.setMotorSpeed(direction2 * speed);
         }
         
         sleep_ms(10);
